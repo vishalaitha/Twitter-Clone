@@ -16,6 +16,8 @@ import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { Token } from "graphql";
 import {} from "../graphql/query/user";
+import { useCurrentUser } from "@/hooks/user";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 // import { VerifyUserGoogleTokenDocument } from "@/gql/graphql";
 interface TwitterSidebarButton {
   title: string;
@@ -56,6 +58,9 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
   },
 ];
 export default function Home() {
+  const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
+  console.log(user);
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
@@ -64,28 +69,25 @@ export default function Home() {
         return toast.error(`Google token not found`);
       }
 
-      const { verifyGoogleToken } = await graphqlClient.request(verifyUserGoogleTokenQuery,{ token:googleToken });
+      const { verifyGoogleToken } = await graphqlClient.request(
+        verifyUserGoogleTokenQuery,
+        { token: googleToken }
+      );
 
-
-      if(!verifyGoogleToken){
-        return toast.error(`Google token was bad from line 72`);
-      }
-
+      toast.success("Verified Success");
       console.log(verifyGoogleToken);
-      console.log(cred);
-      // console.log(googleToken);
-      if(verifyGoogleToken) window.localStorage.setItem("__twitter_token",verifyGoogleToken);
-      return toast.success("Verified Success");
 
-      // return verifyGoogleToken;
+      if (verifyGoogleToken)
+        window.localStorage.setItem("__twitter_token", verifyGoogleToken);
+      await queryClient.invalidateQueries(["current-user"]);
     },
-    []
+    [queryClient]
   );
 
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen  px-40 ">
-        <div className="col-span-3  justify-start pt-8">
+        <div className="col-span-3  justify-start pt-8 relative">
           <div className="text-4xl h-fit hover:bg-gray-800 rounded-full cursor-pointer px-5 transition-all w-fit">
             <RiTwitterXLine />
           </div>
@@ -108,6 +110,25 @@ export default function Home() {
               </button>
             </div>
           </div>
+          {
+            user&&(
+              <div className="absolute bottom-10 flex gap-2 items-center bg-slate-800 px-3 py-2 rounded-full">
+            {user && user.profileImageURL && (
+              <Image
+              className="rounded-full"
+                src={user?.profileImageURL}
+                alt="user-profilepic"
+                height={50}
+                width={50}
+              />
+            )}
+            <div>
+            <h3 className="text-xl">{user?.firstName} {user?.lastName}</h3>
+            <h3 className="text-xl">{user?.email.slice(0,-10  )}</h3>
+            </div>
+          </div>
+            )
+          }
         </div>
 
         <div className="col-span-6 border-r-[1px] border-l-[1px] h-screen overflow-auto scrollbar-hide border-gray-600">
@@ -122,10 +143,12 @@ export default function Home() {
         </div>
 
         <div className="col-span-3 p-5">
-          <div className="p-5 bg-slate-700 rounded-lg">
-            <h1 className="text-2xl my-2">New to Twitter?</h1>
-            <GoogleLogin onSuccess={handleLoginWithGoogle} />
-          </div>
+          {!user && (
+            <div className="p-5 bg-slate-700 rounded-lg">
+              <h1 className="text-2xl my-2">New to Twitter?</h1>
+              <GoogleLogin onSuccess={handleLoginWithGoogle} />
+            </div>
+          )}
         </div>
       </div>
     </div>
