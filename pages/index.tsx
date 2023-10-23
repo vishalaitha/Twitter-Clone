@@ -10,10 +10,13 @@ import { PiBookmarkSimple } from "react-icons/pi";
 import { CgMoreO } from "react-icons/cg";
 import { RiTwitterXLine, RiAccountPinCircleFill } from "react-icons/ri";
 import FeedCard from "@/components/FeedCard";
-import {CredentialResponse, GoogleLogin} from '@react-oauth/google'
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
+import { Token } from "graphql";
+import {} from "../graphql/query/user";
+// import { VerifyUserGoogleTokenDocument } from "@/gql/graphql";
 interface TwitterSidebarButton {
   title: string;
   icon: React.ReactNode;
@@ -53,28 +56,35 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
   },
 ];
 export default function Home() {
+  const handleLoginWithGoogle = useCallback(
+    async (cred: CredentialResponse) => {
+      const googleToken = cred.credential;
 
-  
-  const handleLoginWithGoogle=useCallback(async(cred:CredentialResponse)=>{
-    const googleToken=cred.credential;
+      if (!googleToken) {
+        return toast.error(`Google token not found`);
+      }
 
-    if(!googleToken){
-      return toast.error(`Google token not found`);
-    }
-    const{verifyGoogleToken}=await graphqlClient.request(verifyUserGoogleTokenQuery,{token:googleToken});
-    // const {verifyGoogleToken} = await graphqlClient.request(verifyUserGoogleTokenQuery,{token:googleToken});
-    toast.success('Verified Success');
-    console.log(verifyGoogleToken);
-    if(verifyGoogleToken) window.localStorage.setItem("__twitter_token",verifyGoogleToken);
-  },
-  []);
+      const { verifyGoogleToken } = await graphqlClient.request(verifyUserGoogleTokenQuery,{ token:googleToken });
 
 
+      if(!verifyGoogleToken){
+        return toast.error(`Google token was bad from line 72`);
+      }
+
+      console.log(verifyGoogleToken);
+      console.log(cred);
+      // console.log(googleToken);
+      if(verifyGoogleToken) window.localStorage.setItem("__twitter_token",verifyGoogleToken);
+      return toast.success("Verified Success");
+
+      // return verifyGoogleToken;
+    },
+    []
+  );
 
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen  px-40 ">
-        
         <div className="col-span-3  justify-start pt-8">
           <div className="text-4xl h-fit hover:bg-gray-800 rounded-full cursor-pointer px-5 transition-all w-fit">
             <RiTwitterXLine />
@@ -100,7 +110,6 @@ export default function Home() {
           </div>
         </div>
 
-
         <div className="col-span-6 border-r-[1px] border-l-[1px] h-screen overflow-auto scrollbar-hide border-gray-600">
           <FeedCard />
           <FeedCard />
@@ -113,10 +122,10 @@ export default function Home() {
         </div>
 
         <div className="col-span-3 p-5">
-                <div className="p-5 bg-slate-700 rounded-lg">
-                  <h1 className="text-2xl my-2" >New to Twitter?</h1>
-                <GoogleLogin onSuccess={handleLoginWithGoogle}/>
-                </div>
+          <div className="p-5 bg-slate-700 rounded-lg">
+            <h1 className="text-2xl my-2">New to Twitter?</h1>
+            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+          </div>
         </div>
       </div>
     </div>
