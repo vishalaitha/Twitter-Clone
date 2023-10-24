@@ -1,70 +1,96 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { BiHash, BiHomeCircle, BiSearch } from "react-icons/bi";
-import { GoHomeFill } from "react-icons/go";
-import { IoNotificationsOutline } from "react-icons/io5";
-import { FiMail } from "react-icons/fi";
-import { PiBookmarkSimple } from "react-icons/pi";
-import { CgMoreO } from "react-icons/cg";
-import { RiTwitterXLine, RiAccountPinCircleFill } from "react-icons/ri";
-import { AiOutlinePicture } from "react-icons/ai";
+import { BiImageAlt } from "react-icons/bi";
 import FeedCard from "@/components/FeedCard";
-import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import toast from "react-hot-toast";
-import { graphqlClient } from "@/clients/api";
-import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
-import { Token } from "graphql";
-import {} from "../graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
 import { Tweet } from "@/gql/graphql";
-import TwitterLayout from "@/components/FeedCard/Layout/TwitterLayout";
+import Twitterlayout from "@/components/FeedCard/Layout/TwitterLayout";
 import { GetServerSideProps } from "next";
-import { getAllTweetsQuery } from "@/graphql/query/tweet";
+import { graphqlClient } from "@/clients/api";
+import {
+  getAllTweetsQuery,
+  getSignedURLForTweetQuery,
+} from "@/graphql/query/tweet";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
-// import { VerifyUserGoogleTokenDocument } from "@/gql/graphql";
-
-interface HomeProps{
-  tweets?:Tweet[]
+interface HomeProps {
+  tweets?: Tweet[];
 }
 
-export default function Home(props:HomeProps) {
+export default function Home(props: HomeProps) {
   const { user } = useCurrentUser();
-
-  const { mutate } = useCreateTweet();
-
-  const queryClient = useQueryClient();
+  const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
+  const { mutateAsync } = useCreateTweet();
 
   const [content, setContent] = useState("");
+  const [imageURL, setImageURL] = useState("");
+
+  const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
+    return async (event: Event) => {
+      event.preventDefault();
+      const file: File | null | undefined = input.files?.item(0);
+      if (!file) return;
+
+      const { getSignedURLForTweet } = await graphqlClient.request(
+        getSignedURLForTweetQuery,
+        {
+          imageName: file.name,
+          imageType: file.type,
+        }
+      );
+
+      if (getSignedURLForTweet) {
+        toast.loading("Uploading...", { id: "2" });
+        await axios.put(getSignedURLForTweet, file, {
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+        toast.success("Upload Completed", { id: "2" });
+        const url = new URL(getSignedURLForTweet);
+        const myFilePath = `${url.origin}${url.pathname}`;
+        setImageURL(myFilePath);
+      }
+    };
+  }, []);
 
   const handleSelectImage = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
-    input.click();
-  }, []);
 
-  const handleCreateTweet = useCallback(() => {
-    mutate({
+    const handlerFn = handleInputChangeFile(input);
+
+    input.addEventListener("change", handlerFn);
+
+    input.click();
+  }, [handleInputChangeFile]);
+
+  const handleCreateTweet = useCallback(async () => {
+    await mutateAsync({
       content,
+      imageURL,
     });
-  }, []);
+    setContent("");
+    setImageURL("");
+  }, [mutateAsync, content, imageURL]);
 
   return (
     <div>
-      <TwitterLayout>
+      <Twitterlayout>
         <div>
-          <div className="border border-gray-600 border-l-0 border-r-0 border-b-0 p-5 hover:bg-slate-900 transition-all cursor-pointer">
+          <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
             <div className="grid grid-cols-12 gap-3">
               <div className="col-span-1">
                 {user?.profileImageURL && (
                   <Image
                     className="rounded-full"
                     src={user?.profileImageURL}
+                    alt="user-image"
                     height={50}
                     width={50}
-                    alt={"imgnotefounadsc"}
                   />
                 )}
               </div>
@@ -72,18 +98,23 @@ export default function Home(props:HomeProps) {
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className=" w-full bg-transparent cursor-text text-xl px-3 border-b border-slate-700"
-                  rows={4}
-                  placeholder="What is happening?!"
+                  className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
+                  placeholder="What's happening?"
+                  rows={3}
                 ></textarea>
-                <div className="mt-2 flex justify-between">
-                  <AiOutlinePicture
-                    onClick={handleSelectImage}
-                    className="text-2xl "
+                {imageURL && (
+                  <Image
+                    src={imageURL}
+                    alt="tweet-image"
+                    width={300}
+                    height={300}
                   />
+                )}
+                <div className="mt-2 flex justify-between items-center">
+                  <BiImageAlt onClick={handleSelectImage} className="text-xl" />
                   <button
                     onClick={handleCreateTweet}
-                    className="bg-[#1A8CD8] py-2 px-8 items-center font-semibold rounded-full  text-sm"
+                    className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
                   >
                     Tweet
                   </button>
@@ -92,19 +123,21 @@ export default function Home(props:HomeProps) {
             </div>
           </div>
         </div>
-        {props.tweets?.map((tweet) =>
+        {tweets?.map((tweet) =>
           tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null
         )}
-      </TwitterLayout>
+      </Twitterlayout>
     </div>
   );
 }
 
-export const getServerSideProps:GetServerSideProps<HomeProps>=async(context)=>{
-  const allTweets=await graphqlClient.request(getAllTweetsQuery);
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (
+  context
+) => {
+  const allTweets = await graphqlClient.request(getAllTweetsQuery);
   return {
-    props:{
-      tweets:allTweets.getAllTweets as Tweet[]
-    }
-  }
-}
+    props: {
+      tweets: allTweets.getAllTweets as Tweet[],
+    },
+  };
+};
