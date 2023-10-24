@@ -11,10 +11,10 @@ export const useCreateTweet = () => {
   const mutation = useMutation({
     mutationFn: (payload: CreateTweetData) =>
       graphqlClient.request(createTweetMutation, { payload }),
-    onMutate: () => toast.loading("Creating Tweet", { id: "1" }) ,
+    onMutate: () => toast.loading("Creating Tweet", { id: "before-after" }) ,
     onSuccess: async (payload) => {
       queryClient.invalidateQueries(["all-tweets"]),
-      toast.success('Tweeted',{id:"1"});  
+      toast.success('Tweeted',{id:"before-after"});  
     }
   });
   return mutation;
