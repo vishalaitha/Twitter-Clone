@@ -2,34 +2,50 @@ import { graphql } from "../../gql";
 
 export const verifyUserGoogleTokenQuery = graphql(`
   #graphql
-  query VerifyUserGoogleTokenQuery($token: String!) {
+  query VerifyUserGoogleToken($token: String!) {
     verifyGoogleToken(token: $token)
   }
 `);
 
-export const getCurrentUserQuery = graphql(
-  `
-    query GetCurrentUser {
-      getCurrentUser {
+export const getCurrentUserQuery = graphql(`
+  query GetCurrentUser {
+    getCurrentUser {
+      id
+      profileImageURL
+      email
+      firstName
+      lastName
+      recommendedUsers{
         id
-        profileImageURL
-        email
         firstName
         lastName
-        tweets {
+        profileImageURL
+      }
+      followers {
+        id
+        firstName
+        lastName
+        profileImageURL
+      }
+      following {
+        id
+        firstName
+        lastName
+        profileImageURL
+      }
+      tweets {
+        id
+        content
+        author {
           id
-          content
-          author {
-            id
-            firstName
-            lastName
-            profileImageURL
-          }
+          firstName
+          lastName
+          profileImageURL
         }
       }
     }
-  `
-);
+  }
+`);
 
 export const getUserByIdQuery = graphql(`
   #graphql
@@ -39,6 +55,19 @@ export const getUserByIdQuery = graphql(`
       firstName
       lastName
       profileImageURL
+      
+      followers {
+        id
+        firstName
+        lastName
+        profileImageURL
+      }
+      following {
+        id
+        firstName
+        lastName
+        profileImageURL
+      }
       tweets {
         content
         id
