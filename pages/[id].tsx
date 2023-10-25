@@ -110,9 +110,12 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           </div>
         </div>
         <div>
-          {props.userInfo?.tweets?.map((tweet) => (
+          
+          {
+          props.userInfo?.tweets?.map((tweet) => (
             <FeedCard data={tweet as Tweet} key={tweet?.id} />
           ))}
+
         </div>
       </TwitterLayout>
     </div>

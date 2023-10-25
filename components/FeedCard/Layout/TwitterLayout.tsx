@@ -18,6 +18,7 @@ import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Link from "next/link";
+const plugin=require('tailwindcss/plugin')
 
 interface TwitterSidebarButton {
   title: string;
@@ -43,12 +44,12 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
       {
         title: "Explore",
         icon: <BiSearch />,
-        link: "/",
+        link: "/explore",
       },
       {
         title: "Notifications",
         icon: <IoNotificationsOutline />,
-        link: "/",
+        link: "/notifications",
       },
       {
         title: "Messages",
@@ -102,19 +103,19 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
     [queryClient]
   );
   return (
-    <div>
+    <div  >
       <div className="grid grid-cols-12 h-screen w-screen sm:px-56">
-        <div className="col-span-2 sm:col-span-3 pt-1 flex sm:justify-end pr-4 relative">
+        <div className="col-span-2  sm:col-span-3 pt-1 flex sm:justify-end pr-4 relative">
           <div>
             <div className="text-2xl h-fit w-fit hover:bg-gray-800 rounded-full p-4 cursor-pointer transition-all">
               <RiTwitterXLine />
             </div>
-            <div className="mt-1 text-xl pr-4">
+            <div className="mt-1 text-2xl pr-4">
               <ul>
                 {sidebarMenuItems.map((item) => (
                   <li key={item.title}>
                     <Link
-                      className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full px-3 py-3 w-fit cursor-pointer mt-2"
+                      className="flex justify-start items-center gap-4 font-semibold hover:bg-gray-800 rounded-full px-3 py-3 w-fit cursor-pointer mt-2"
                       href={item.link}
                     >
                       <span className=" text-3xl">{item.icon}</span>
@@ -134,7 +135,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
             </div>
           </div>
           {user && (
-            <div className="absolute bottom-5 flex gap-2 items-center bg-slate-800 px-3 py-2 rounded-full">
+            <div className=" absolute bottom-5  flex gap-2 items-center bg-slate-800 px-3 py-2 rounded-full">
               {user && user.profileImageURL && (
                 <Image
                   className="rounded-full"
@@ -145,7 +146,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
                 />
               )}
               <div className="hidden sm:block">
-                <h3 className="text-xl">
+                <h3 className="text-xl font-semibold">
                   {user?.firstName} {user?.lastName}
                 </h3>
                 <h3 className="text-xl">
@@ -156,7 +157,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
             </div>
           )}
         </div>
-        <div className="col-span-10 sm:col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
+        <div className="col-span-10 scrollbar-hide sm:col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
           {props.children}
         </div>
 
@@ -167,26 +168,26 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
               <GoogleLogin onSuccess={handleLoginWithGoogle} />
             </div>
           ) : (
-            <div className="px-4 py-3 bg-slate-800 rounded-lg">
-              <h1 className="my-2 text-2xl mb-5">Users you may know</h1>
+            <div className="px-4 py-3 bg-[#16181C] rounded-3xl">
+              <h1 className="my-2 text-2xl mb-5 font-semibold">Users you might know</h1>
               {user?.recommendedUsers?.map((el) => (
-                <div className="flex items-center gap-3 mt-2" key={el?.id}>
+                <div className="flex items-center gap-3 mt-5 ml-1" key={el?.id}>
                   {el?.profileImageURL && (
                     <Image
                       src={el?.profileImageURL}
                       alt="user-image"
-                      className="rounded-full"
+                      className="rounded-full mr-2"
                       width={60}
                       height={60}
                     />
                   )}
                   <div>
-                    <div className="text-lg">
+                    <div className="text-lg font-semibold pb-2">
                       {el?.firstName} {el?.lastName}
                     </div>
                     <Link
                       href={`/${el?.id}`}
-                      className="bg-white text-black text-sm px-5 py-1 w-full rounded-lg"
+                      className="bg-[#1d9bf0] text-white font-semibold text-sm px-6 py-1 w-full rounded-full"
                     >
                       View
                     </Link>
@@ -201,3 +202,4 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
   );
 };
 export default TwitterLayout;
+

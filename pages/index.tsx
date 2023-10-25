@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState,useRef } from "react";
 import Image from "next/image";
 import { BiImageAlt } from "react-icons/bi";
 import FeedCard from "@/components/FeedCard";
@@ -20,6 +20,7 @@ interface HomeProps {
 }
 
 export default function Home(props: HomeProps) {
+  const textAreaRef = useRef(null);
   const { user } = useCurrentUser();
   const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
   const { mutateAsync } = useCreateTweet();
@@ -68,6 +69,14 @@ export default function Home(props: HomeProps) {
     input.click();
   }, [handleInputChangeFile]);
 
+  useEffect(() => {
+    if (textAreaRef.current) {
+        textAreaRef.current.style.height = "auto";
+        textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+    }
+}, [content, textAreaRef]);
+
+
   const handleCreateTweet = useCallback(async () => {
     await mutateAsync({
       content,
@@ -83,9 +92,10 @@ export default function Home(props: HomeProps) {
         <div>
           <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
             <div className="grid grid-cols-12 gap-3">
-              <div className="col-span-1">
+              <div className="col-span-2 sm:col-span-1">
                 {user?.profileImageURL && (
                   <Image
+                    
                     className="rounded-full"
                     src={user?.profileImageURL}
                     alt="user-image"
@@ -94,13 +104,14 @@ export default function Home(props: HomeProps) {
                   />
                 )}
               </div>
-              <div className="col-span-11">
-                <textarea
+              <div className="col-span-10 sm:col-span-11">
+                <textarea 
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
+                  className="w-full scrollbar-hide bg-transparent text-xl px-3 border-b border-slate-700 flex flex-grow"
                   placeholder="What's happening?"
                   rows={3}
+                  ref={textAreaRef}
                 ></textarea>
                 {imageURL && (
                   <Image
