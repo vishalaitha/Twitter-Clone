@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState,useRef } from "react";
+import React, { useCallback, useEffect, useState,useRef, RefObject } from "react";
 import Image from "next/image";
 import { BiImageAlt } from "react-icons/bi";
 import FeedCard from "@/components/FeedCard";
@@ -29,6 +29,14 @@ export default function Home(props: HomeProps) {
   const [imageURL, setImageURL] = useState("");
 
   const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
+    const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null);
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+    }
+  }, [content, textAreaRef]);
+
     return async (event: Event) => {
       event.preventDefault();
       const file: File | null | undefined = input.files?.item(0);
@@ -68,14 +76,6 @@ export default function Home(props: HomeProps) {
 
     input.click();
   }, [handleInputChangeFile]);
-
-  useEffect(() => {
-    if (textAreaRef.current) {
-        textAreaRef.current.style.height = "auto";
-        textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
-    }
-}, [content, textAreaRef]);
-
 
   const handleCreateTweet = useCallback(async () => {
     await mutateAsync({
