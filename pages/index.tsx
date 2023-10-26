@@ -148,7 +148,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   const allTweets = await graphqlClient.request(getAllTweetsQuery);
   return {
     props: {
-      tweets: allTweets.getAllTweets as Tweet[],
+      tweets: (allTweets.getAllTweets as Tweet[]).reverse(),
     },
   };
 };

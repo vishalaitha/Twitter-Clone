@@ -18,6 +18,10 @@ import { Tweet, User } from "@/gql/graphql";
 import { graphqlClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
 import { useCallback, useMemo } from "react";
+import {
+  getAllTweetsQuery,
+  getSignedURLForTweetQuery,
+} from "@/graphql/query/tweet";
 // import {
 //   followUserMutation,
 //   unfollowUserMutation,
@@ -25,6 +29,10 @@ import { useCallback, useMemo } from "react";
 interface ServerProps {
   userInfo?: User;
 }
+interface HomeProps {
+  tweets?: Tweet[];
+}
+
 import { useQueryClient } from "@tanstack/react-query";
 import TwitterLayout from "@/components/FeedCard/Layout/TwitterLayout";
 import { userInfo } from "os";
@@ -38,10 +46,11 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     return (
       (currentUser?.following?.findIndex(
         (el) => el?.id === props.userInfo?.id
-      ) ?? -1) >= 0
-    );
-  }, [currentUser?.following, props.userInfo]);
-
+        ) ?? -1) >= 0
+        );
+      }, [currentUser?.following, props.userInfo]);
+      
+  const tweets = (props.userInfo?.tweets as Tweet[]).reverse();
   const handleFollowUser = useCallback(async () => {
     if (!props.userInfo?.id) return;
 
@@ -110,11 +119,10 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           </div>
         </div>
         <div>
-          
-          {
-          props.userInfo?.tweets?.map((tweet) => (
-            <FeedCard data={tweet as Tweet} key={tweet?.id} />
-          ))}
+
+        {tweets?.map((tweet) =>
+          tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null
+        )}
 
         </div>
       </TwitterLayout>
