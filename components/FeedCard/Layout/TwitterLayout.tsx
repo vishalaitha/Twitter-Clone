@@ -100,7 +100,8 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
 
       if (verifyGoogleToken)
         window.localStorage.setItem("__twitter_token", verifyGoogleToken);
-        await queryClient.invalidateQueries(["current-user"]);
+        await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+
     },
     [queryClient]
   );
