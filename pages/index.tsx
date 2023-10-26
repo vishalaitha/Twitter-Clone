@@ -20,7 +20,7 @@ interface HomeProps {
 }
 
 export default function Home(props: HomeProps) {
-  const textAreaRef = useRef(null);
+  // const textAreaRef = useRef(null);
   const { user } = useCurrentUser();
   const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
   const { mutateAsync } = useCreateTweet();
@@ -29,13 +29,13 @@ export default function Home(props: HomeProps) {
   const [imageURL, setImageURL] = useState("");
 
   const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
-    const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null);
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
-    }
-  }, [content, textAreaRef]);
+  //   useEffect(() => {
+  //   const textAreaRef: RefObject<HTMLTextAreaElement> = useRef(null);
+  //   if (textAreaRef.current) {
+  //     textAreaRef.current.style.height = "auto";
+  //     textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+  //   }
+  // }, [content, textAreaRef]);
 
     return async (event: Event) => {
       event.preventDefault();
@@ -111,7 +111,7 @@ export default function Home(props: HomeProps) {
                   className="w-full scrollbar-hide bg-transparent text-xl px-3 border-b border-slate-700 flex flex-grow"
                   placeholder="What's happening?"
                   rows={3}
-                  ref={textAreaRef}
+                  // ref={textAreaRef}
                 ></textarea>
                 {imageURL && (
                   <Image
