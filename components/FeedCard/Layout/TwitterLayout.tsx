@@ -85,10 +85,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
-
-      if (!googleToken) {
-        return toast.error(`Google token not found`);
-      }
+      if (!googleToken) return toast.error(`Google token not found`);
 
       const { verifyGoogleToken } = await graphqlClient.request(
         verifyUserGoogleTokenQuery,
@@ -100,8 +97,8 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
 
       if (verifyGoogleToken)
         window.localStorage.setItem("__twitter_token", verifyGoogleToken);
-        await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      // await queryClient.invalidateQueries(["curent-user"]);
     },
     [queryClient]
   );
@@ -180,13 +177,11 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
                 shape="pill"
                 size="large"
                 logo_alignment="center"
-                width={
-                  "200%"
-                }
+                width={"200%"}
+                onSuccess={handleLoginWithGoogle}
                 onError={() => {
                   console.log("Login failed");
                 }}
-                onSuccess={handleLoginWithGoogle}
               />
             </div>
           ) : (
