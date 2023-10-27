@@ -172,17 +172,7 @@ const TwitterLayout: React.FC<TwitterlayoutProps> = (props) => {
           {!user ? (
             <div className="p-5 bg-slate-700 w-xl rounded-lg">
               <h1 className="my-2 text-2xl">New to Twitter?</h1>
-              <GoogleLogin
-                theme="filled_blue"
-                shape="pill"
-                size="large"
-                logo_alignment="center"
-                width={"200%"}
-                onSuccess={handleLoginWithGoogle}
-                onError={() => {
-                  console.log("Login failed");
-                }}
-              />
+              <GoogleLogin onSuccess={handleLoginWithGoogle} />
             </div>
           ) : (
             <div className="px-4 py-3 bg-[#16181C] rounded-3xl">
