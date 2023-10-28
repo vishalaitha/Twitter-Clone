@@ -84,18 +84,12 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
               </div>
               {currentUser?.id !== props.userInfo?.id && (
                 <>
-                  {amIFollowing ? (
-                    <button
-                      onClick={handleUnfollowUser}
-                      className="bg-[#1d9bf0] text-black px-3 py-1 rounded-full text-sm"
-                    >
+                 {amIFollowing ? (
+                    <button onClick={handleUnfollowUser} className=" rounded-full mx-7 font-bold px-10 bg-[#1d9bf0] outline-black py-2">
                       Unfollow
                     </button>
                   ) : (
-                    <button
-                      onClick={handleFollowUser}
-                      className="bg-[#1d9bf0] text-black px-3 py-1 rounded-full text-sm"
-                    >
+                    <button onClick={handleFollowUser} className=" rounded-full mx-7 px-10 font-bold bg-[#1d9bf0] outline-black py-2">
                       Follow
                     </button>
                   )}
