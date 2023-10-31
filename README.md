@@ -2,7 +2,15 @@
 <!-- Headings -->
 <!-- Installations should be either at the start or the end -->
 
-# Twitter clone 
+# Twitter Clone - Typescript | NodeJS | GraphQL | PostgreSQL | AWS
+
+Recreated important functions of Twitter using Typescript as the primary frontend language and NodeJS for backend. Easy to scale and upgradable on demand. Used Redis to cache data such that subsequent requests get faster response as the scale grows.
+
+For the _frontend_ I used **NextJS** for server side rendering, **Tailwind CSS** for styling, **GraphQL** queries/mutations, and hosted on **Vercel**.
+
+For the _backend_ I used **Apollo server** for the **GraphQl API**, **PostgreSQL** for the database, **Supabase** for hosting. This is hosted on **AWS EC2** Machine. The backend server is **SSL certified** with **NGINX proxy**.
+
+For _storage and hosting_, I used **Amazon S3** and **AWS EC2**. **Google OAuth** and **JSON web tokens** were used for authentication.
 
 installation guide will be at the end
 
