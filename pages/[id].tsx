@@ -20,9 +20,16 @@ interface ServerProps {
 }
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
+  
   const router = useRouter();
   const { user: currentUser } = useCurrentUser();
   const queryClient = useQueryClient();
+  const tweetsbyuser = props.userInfo?.tweets;
+  // console.log("hi")
+  if (tweetsbyuser) {
+    tweetsbyuser.reverse();
+    // console.log(tweetsbyuser);
+  }
 
   const amIFollowing = useMemo(() => {
     if (!props.userInfo) return false;
@@ -104,7 +111,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             </div>
           </div>
           <div>
-            {props.userInfo?.tweets?.map((tweet) => (
+            {tweetsbyuser?.map((tweet) => (
               <FeedCard data={tweet as Tweet} key={tweet?.id} />
             ))}
           </div>

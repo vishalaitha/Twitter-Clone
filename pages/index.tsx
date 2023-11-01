@@ -85,12 +85,15 @@ export default function Home(props: HomeProps) {
   }, [content, textAreaRef]);
 
   const handleCreateTweet = useCallback(async () => {
-    await mutateAsync({
-      content,
-      imageURL,
-    });
-    setContent("");
-    setImageURL("");
+    if(!user) toast.error("You're not signed in");
+    if(user){
+      await mutateAsync({
+        content,
+        imageURL,
+      });
+      setContent("");
+      setImageURL("");
+    }
   }, [mutateAsync, content, imageURL]);
 
   return (
